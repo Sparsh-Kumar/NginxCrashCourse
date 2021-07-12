@@ -1,0 +1,79 @@
+
+
+1. For using Nginx as a static web server, proxy etc you need to make changes to only "nginx.conf" file.
+2. There is no other file that you need to modify.
+3. In linux systems, the "nginx.conf" file is located inside "/etc/nginx/nginx.conf".
+4. In linux you would use these commands frequently.
+    a. sudo systemctl stop nginx. # For stopping the nginx server,
+    b. sudo systemctl start nginx. # For starting the nginx server.
+    c. sudo systemctl status nginx. # For looking the status of nginx server.
+    d. sudo systemctl restart nginx. # For restarting the nginx server.
+    e. sudo systemctl reload nginx # For reloading a server without stopping or detaching current nginx connections [preferred way for restarting the nginx server].
+
+5. nginx.conf file for creating a Basic Static Web Server.
+
+    http { # This is known as directive
+        server { # This is known as directive
+            listen 8080;    #This is known as leaf directive, as it don't have any other directive inside of it.
+        }
+    }
+
+    events { }
+
+6. You can create as many servers as you want.
+
+    http { # This is known as directive
+        server { # This is known as directive
+            listen 8080;    #This is known as leaf directive, as it don't have any other directive inside of it.
+        }
+        server {
+            listen 9090;
+        }
+    }
+
+    events { }
+
+7. Now as you can see from point 5 and point 6, we have not given the server a "root directory" from which it can serve it content. 
+8. By default if we don't give any root directory to "server" directive, then it will host a default "index.html" file.
+9. But we can give the server a root directory also using the syntax given below.
+10. Now create a new Directory on Desktop (say /home/tonystark/Desktop/NginxDefaultData).
+11. You can specify the root directory for a server to use in Nginx using this syntax
+
+    http { # This is known as directive                                                                                      
+        server { # This is known as directive                                                                            
+            root /home/tonystark/Desktop/NginxDefaultData/;                                                          
+            listen 8080;    #This is known as leaf directive, as it don't have any other directive inside of it.     
+        }                                                                                                                
+    }
+
+    events { } 
+
+    a. Now as you can see here , when you navigate to http://localhost:8080.
+    b. Then nginx will serve index.html file placed in the directory specified in "root" directive above.
+    c. If there is no index.html file then the Nginx server will now display 403 Forbidden Error.
+    d. But if there is another file (say sample.txt) in the root directory, then you still can navigate to http://localhost:8080/sample.txt file.
+    e. You would be able to see the content of that file successfully or you can also navigate to subfolder of that root directory successfully (if available).
+
+12. You can also change the value of "root" directive based on the path navigated by the user.
+    a. For example when user navigates to http://localhost:8080/
+    b. Then you set the root folder to be /home/tonystark/Desktop/NginxDefaultData
+    c. And there is an index.html at that place, so it would be served.
+    d. Now you want if user navigates to http://localhost:8080/images.
+    e. Then in that case, the root directory or value of root directive becomes /home/tonystark/Pictures.
+    f. If there is an index.html file at that place, then it would get served.
+    g. If not then he will get an 403 Forbidden error, but he would still be able to see other files.
+    h. for example if there is a file named sampleimage.png, at /home/tonystark/Pictures.
+    i. Then user can see that image using the url http://localhost:8080/images/sampleimage.png
+    j. you can achieve this using the "nginx.conf" code given below
+
+    http {
+        server {
+            listen 8080;
+            root /home/tonystark/Desktop/NginxDefaultData/;
+            location /images {
+                alias /home/tonystark/Pictures/; # 'alias' is keyword used to set the root folder value here on hitting http://localhost:8080/images endpoint.
+            }
+        }
+    }
+
+    events { }

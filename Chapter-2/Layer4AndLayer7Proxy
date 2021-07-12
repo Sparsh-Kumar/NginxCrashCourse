@@ -1,0 +1,7 @@
+
+
+1. Nginx can operate in Layer 4 (tcp) or Layer 7 (http).
+2. In Layer 4 you have some very limited things to work on for example IP-ADDRESS, PORT etc.
+3. In Layer 7 you have many things to work on for example HTTP, Headers, Request body, Request Method etc.
+4. Using "stream" context it becomes Layer 4 proxy.
+5. Using "http" context it becomes Layer 7 proxy.

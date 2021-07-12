@@ -1,0 +1,36 @@
+
+
+1. Nginx is an open source web server.
+2. It is written in C.
+3. It can also be used as a proxy.
+4. It can also be used as a load balancer.
+5. Basically It is one of the few softwares that can be used as a web server and a proxy.
+6. It can also be used for Backend routing.
+7. It can also be used for Caching purposes.
+8. Now start analyzing the situation given in the pic (currentArchwithoutNginx.png) [NOT PREFERRED SOLUTION FOR SCALING AN APPLICATION].
+    a. You started a backend server at some ip and port and give people the url (may be say http://yourIp:yourPort)
+    b. People started hitting that endpoint, that endpoint in turn access a database and retrieve some value or values from the Database.
+    c. The returned value or values are then given in the response by the server to the client (which can be a browser).
+    d. Now consider the scenerio that the number of people who are hitting that api endpoint increased by a considerable amount.
+    e. You want to scale your application.
+    f. The best you can do is to make another server and host it somewhere.
+    g. Now you provide the address of the new server (may be say http://yourSecondIp:yourSecondPort) to clients.
+    h. Now you tell people not to hit the previous endpoint, as it has a lot of traffic, but you suggest them to hit the new api endpoint.
+    i. Now your new server can have a lot of load or traffic and now you may need to scale further, so you would repeat the same process.
+    j. This will increase your cost of maintainance and increase the headache for a developer.
+    k. For getting the preferred solution for scaling look into point 9 of this file.
+9. Now start analyzing the situation given in the pic (DesiredArchWithNginx.png) [PREFERRED SOLUTION FOR SCALING AN APPLICATION].
+    a. You started a backend server at some ip and port .
+    b. But this time, you also added an additional layer of nginx to that server.
+    c. Now you provide the address for that nginx server to the people (may be say http://yourIp:yourPort).
+    d. People started hitting that address , nginx will then look into what servers are available to it and what algorithm is configured on it.
+    e. Let's say you now have only 1 server and you have configured the 'Round Robin algorithm' for redirecting the traffic from nginx to a web server which is behind nginx.
+    f. Now nginx will redirect the traffic from itself to "Server-1"
+    g. But now the number of people hitting that api endpoint increased considerably, then
+    h. you made another server named "Server-2" and add it behind Nginx also.
+    i. Now traffic will redirect from nginx to servers in a Round robin fashion.
+    j. First request will hit the "Server-1"
+    k. Second request will hit the "Server-2"
+    l. and so in.. you can configure as many server as you want behind nginx.
+    m. you also don't need to change the address given to clients for accessing the application.
+    n. This is the preferred way for scaling a web application.
