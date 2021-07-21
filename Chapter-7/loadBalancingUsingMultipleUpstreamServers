@@ -1,0 +1,60 @@
+
+
+
+1. You can also specify load balancing for multiple 'routes' seperately.
+2. For example in the below configuration
+3. If user navigate to http://localhost:80, then load balancing will be done, using round robin approach on these addresses
+        server 127.0.0.1:8888;
+        server 127.0.0.1:9999;
+        server 127.0.0.1:5555;
+        server 127.0.0.1:4444;
+
+4. If user navigates to http://localhost/app1, then load balancing will be done, using round robin approach on these addresses
+        server 127.0.0.1:8888;
+        server 127.0.0.1:9999;
+
+5. If user navigates to http://localhost/app2, then load balancing will be done, using round robin approach on these addresses
+        server 127.0.0.1:5555;
+        server 127.0.0.1:4444;
+
+http {
+
+    upstream allbackend {
+        # you can specify which algorithm to use for load balancing here.
+        #ip_hash; # this will make a the hash of client ip address and stick all the requests from that client ip address to only one server address. this is known as sticky sessions;
+        server 127.0.0.1:8888;
+        server 127.0.0.1:9999;
+        server 127.0.0.1:5555;
+        server 127.0.0.1:4444;
+    }
+
+    upstream app1backend {
+        server 127.0.0.1:8888;
+        server 127.0.0.1:9999;
+    }
+
+    upstream app2backend {
+        server 127.0.0.1:5555;
+        server 127.0.0.1:4444;
+    }
+
+    server {
+        
+        listen 80;
+        location / {
+            proxy_pass http://allbackend/;
+        }
+
+        location /app1 {
+            proxy_pass http://app1backend;
+        }
+
+        location /app2 {
+            proxy_pass http://app2backend;
+        }
+
+    }
+
+}
+
+events { }
