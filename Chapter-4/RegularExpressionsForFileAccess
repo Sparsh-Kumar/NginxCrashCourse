@@ -1,0 +1,34 @@
+
+
+1. We can also use regular expressions to allow or not allow download of any file in any path specified in the server.
+2. For example you may have a server on http://localhost:8080.
+3. For that server, the initial root directory would be '/home/ubuntu/Desktop/'
+4. You have 'index.html' file placed in '/home/ubuntu/Desktop/' directory.
+5. So after navigating to 'http://localhost:8080/', you will be displayed the content of the file 'index.html' placed in '/home/ubuntu/Desktop'.
+6. Suppose you also have another file at '/home/ubuntu/Desktop' named 'file.png'.
+7. You can access this file using url 'http://localhost:8080/file.png'.
+8. Now we have to specify another path '/images' to the http server.
+9. On navigating to this path, the root directory would be '/home/ubuntu/Pictures'
+10. You have another 'index.html' file placed at '/home/ubuntu/Pictures'.
+11. So after navigating to 'http://localhost:8080/images/', you will be served the html content of the file placed at '/home/ubuntu/Pictures'.
+12. You also have another file named file2.png at '/home/ubuntu/Pictures'.
+13. So If a user navigating to 'http://localhost:8080/images/file2.png', then he would be able to see that file or download that file.
+14. But you want to disallow viewing or downloading of any file with '.png' extension at this path 'http://localhost:8080/images'.
+    which has a root directory of '/home/ubuntu/Pictures'.
+15. The 'nginx.conf' file code, for this scenerio is given below.
+
+http {
+    server {
+        listen 8080;
+        root /home/tonystark/Desktop/;
+        location /images {
+            alias /home/tonystark/Pictures/;
+            location ~.png$ { # Here we have used the regular expression to restrict the viewing or download of any file having .png extension.
+                return 403;
+            }
+        }
+    }
+}
+
+events { }
+

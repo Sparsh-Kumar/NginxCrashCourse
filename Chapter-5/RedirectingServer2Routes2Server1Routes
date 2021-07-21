@@ -1,0 +1,36 @@
+
+
+1. As we have already discussed, how we can make as many servers as we want in nginx.
+2. We can redirect the request to a particular endpoint to completely different endpoint.
+3. For Example , we may have a server listening on port 8080.
+4. Its root directory we have set now is '/home/ubuntu/Desktop', and we have placed an 'index.html' file at this root location.
+5. So if somebody navigates to 'http://localhost:8080/', he will be served the content of 'index.html' file placed at root location '/home/ubuntu/Desktop'.
+6. Now we made another server, listening on port 8888;
+7. If someone navigates to home route '/' we want the traffic to be redirected to 'http://localhost:8080/'
+8. The nginx.conf code for this is given below.
+9. We made use of 'proxy_pass' directive for traffic redirection.
+
+http {
+
+    server {
+        listen 8080;
+        root /home/tonystark/Desktop/;
+        location /images {
+            alias /home/tonystark/Pictures/;
+        }
+    }
+
+
+    server {
+        listen 8888;
+        location / {
+            proxy_pass http://localhost:8080/;
+        }
+        location /img {
+            proxy_pass http://localhost:8080/images;
+        }
+    }
+    
+}
+
+events { }
