@@ -1,0 +1,26 @@
+
+1. The load Balancer configuration for nginx.conf file is given below.
+2. The first request to http://localhost:80 will be redirected to 127.0.0.1:8888
+3. The second request to http://localhost:80 will be redirected to 127.0.0.1:9999;
+4. The third request to http://localhost:80 will be redirected to 127.0.0.1:5555;
+5. By default when we make an upstream server, the round robin approach would be used as a load balancer.
+6. You can execute the servers given in TestServers and use given below 'nginx.conf' to use it as a loadbalancer.
+
+http {
+
+    upstream allbackend {
+        server 127.0.0.1:8888;
+        server 127.0.0.1:9999;
+        server 127.0.0.1:5555;
+    }
+
+    server {
+        listen 80;
+        location / {
+            proxy_pass http://allbackend/;
+        }
+    }
+
+}
+
+events { }
