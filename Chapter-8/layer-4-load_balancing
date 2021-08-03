@@ -1,0 +1,26 @@
+
+
+/*
+    DIFFERENCE B/W LAYER -4 AND LAYER-7 PROXY
+    -----------------------------------------
+
+    The difference between layer 4 load balancing and layer 7 load balancing is based on the various layers in the Open Systems Interconnection (OSI) Reference Model for networking.
+    An Layer 4 load balancer works at the transport layer, using the TCP and UDP protocols to manage transaction traffic based on a simple load balancing algorithm and basic information such as server connections and response times.
+    An Layer 7 load balancer works at the application layer—the highest layer in the OSI model—and makes its routing decisions based on more detailed information such as the characteristics of the HTTP/HTTPS header, message content, URL type, and cookie data.
+    An L4-7 load balancer manages traffic based on a set of network services across ISO layers 4 through 7 that provide data storage, manipulation, and communication services.
+*/
+
+/*
+    Layer 4 Load Balancing
+    -----------------------
+    Layer 4 load balancing, operating at the transport level, manages traffic based on network information such as application ports and protocols without visibility into the actual content of messages.
+    This is an effective approach for simple packet-level load balancing. The fact that messages are neither inspected nor decrypted allows them to be forwarded quickly, efficiently, and securely.
+    On the other hand, because layer 4 load balancing is unable to make decisions based on content, it’s not possible to route traffic based on media type, localization rules, or other criteria beyond simple algorithms such as round-robin routing.
+*/
+
+/*
+    Layer 7 Load Balancing
+    ------------------------
+    Layer 7 load balancing operates at the application level, using protocols such as HTTP and SMTP to make decisions based on the actual content of each message.
+    Instead of merely forwarding traffic unread, a layer 7 load balancer terminates network traffic, performs decryption as needed, inspects messages, makes content-based routing decisions, initiates a new TCP connection to the appropriate upstream server, and writes the request to the server.
+*/
