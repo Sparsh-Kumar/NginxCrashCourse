@@ -1,0 +1,110 @@
+
+
+1. There are six types of timeouts that you can configure on Nginx to give you more performance.
+2. The first timeout is Client Header timeout, more information regarding client Header Timeout is given below.
+
+CLIENT_HEADER_TIMEOUT
+=====================
+
+1. Client is responsible for this timeout.
+2. Initially the client makes an HTTP request, an HTTP request is made up of different parts, 
+3. An HTTP request has 'HEADER', 'BODY' and other stuff too.
+4. Consider the scenerio we are making use of Nginx as a load balancer.
+5. Client make a GET request to Nginx server.
+6. When client start making a GET requests, as HTTP request make use of TCP inside it, therefore 'HEADER' section of the request 
+   is nothing but a chunk of 'bytes', so these bytes become packets.
+7. The maximum size of a packet is according to the MTU (Maximum transmission Unit) (https://en.wikipedia.org/wiki/Maximum_transmission_unit).
+8. Consider the HEADER part of HTTP request become 3-4 packets.
+9. So client start sending these packets (having HEADER part of HTTP request) to NGINX, and these packets have some information that tells NGINX
+   that Client is sending HEADER part of HTTP request.
+10. So NGINX start a timer known as 'HEADER timer'.
+11. So If all the packets of 'HEADER' part of HTTP request does not arrive to NGINX in that specified time, that was given in CLIENT_HEADER_TIMEOUT,
+    then the NGINX will just kill the connection.
+
+3. The second timeout is Client Body Timeout, more information regarding client Body timeout is given below.
+
+CLIENT_BODY_TIMEOUT
+===================
+
+1. This type of Timeout deals with the 'BODY' part of Client HTTP request.
+2. Initially the client makes an HTTP request, an HTTP request is made up of different parts, 
+3. An HTTP request has 'HEADER', 'BODY' and other stuff too.
+4. Consider the scenerio we are making use of Nginx as a load balancer.
+5. Client make a POST request to Nginx server.
+6. When client start making a POST requests, as HTTP request make use of TCP inside it, therefore 'BODY' section of the request 
+   is nothing but a chunk of 'bytes', so these bytes become packets.
+7. The maximum size of a packet is according to the MTU (Maximum transmission Unit) (https://en.wikipedia.org/wiki/Maximum_transmission_unit).
+8. Consider the 'BODY' part of HTTP request become 3-4 packets.
+9. So client start sending these packets (having BODY part of HTTP request) to NGINX, and these packets have some information that tells NGINX
+   that Client is sending BODY part of HTTP request.
+10. So NGINX start a timer known as 'BODY timer'.
+11. (IMPORTANT HERE) - Now here is a little bit of catch, when the Nginx recieve first packet and it is of body type packet, then
+    nginx start a 'BODY timer'.
+12. Now when first packet get accepted by Nginx successfully, then It resets the timer.
+13. So when second packet arrives Nginx, then it starts the timer again.
+14. If that second packet recieved successfully by Nginx then it will reset the timer.
+15. If that second packet cannot be recieved successfully by Nginx due to some error, then Nginx does not reset the timer.
+16. If multiple failed attempts done for recieving a particular packet and Nginx see that now Body timer value is 'x' which is >= 'y' (the specified value in Client Body timeout),
+    then Nginx kill the connection.
+
+
+4. The third timeout is SEND_TIMEOUT
+
+SEND_TIMEOUT
+==============
+
+1. Now consider the scenerio the client make an HTTP request to Nginx.
+2. Nginx acknowledge that request and proxies that request to an appropriate backend as Nginx is working as a Load Balancer.
+3. Nginx recieve the response from the backend servers and now It need to send that response to the client.
+4. As response is a chunk of bytes, so we can say that Nginx is sending the response to the clients in the form of packets.
+5. Now this is the time where SEND_TIMEOUT comes into play.
+6. As Nginx send first response packet to client, it start a timer known as SEND_TIMEOUT timer,
+7. If that packet is recieved successfully by the client (or we can say that client send an ACK packet to Nginx), then Nginx sends the second packet and RESETS THE SEND_TIMEOUT TIMER.
+8. Now consider the scenerio that there is 3rd packet, that kept failing and cannot be acknowledged by the client.
+9. In that case Nginx does not reset the SEND_TIMEOUT timer, and thus sees that time consumption for failing request >= SEND_TIMEOUT time which was being set in the timer.
+10. If yes, then Nginx kills the connection.
+
+
+5. The fourth timeout is KEEPALIVE_TIMEOUT
+
+KEEPALIVE_TIMEOUT
+=================
+
+1. This one is a very straight forward timeout type.
+2. Consider the scenerio , that client has maintained a successull connection with the Nginx server.
+3. Then Nginx server will start a timer named KEEPALIVE_TIMER.
+4. And Now client send 4 request to Nginx server, the Nginx server proceeded and send 4 responses to the client successfully.
+5. Now after 4 requests-responses, there is a connection still established b/w Client and Nginx but client is not sending any request to Nginx.
+   and Nginx is also not sending any response to client, so We can say that.
+6. There is a connection established b/w Client and Nginx Server but both of them are in idle state.
+7. So If the time of Ideal state >= KEEPALIVE_TIMEOUT that was being specified in Nginx configuration.
+8. Then Nginx kills the connection.
+
+6. The fifth timeout is LINGERING_TIMEOUT
+
+LINGERING_TIMEOUT
+=================
+
+1. When Client closes connection due to any reason or when Nginx server closes connection due to any reason, then the closing of connection is done by just immediately dropping all the packets.
+2. So there is no graceful closing of the connection and it is also the violation of HTTP request protocols, that lay emphasis on doing gracefully closing of connection.
+3. Now There we have 3 options in Nginx for Lingering 'NO', 'YES', 'ALWAYS'.
+4. If Lingering is set to 'NO', then closing of connection will be immediately done by dropping packets.
+5. If Lingering is set to 'YES' or 'ALWAYS', then the Nginx server will not close the connection immediately.
+6. It will start a LINGERING_TIMEOUT, whose value will be specified (generally It would be of 5 seconds).
+7. If there any request comes in that 5 secs, then It will proceed with that request and proxy the request to appropriate backend server.
+8. After getting the response from backend server It will give response to the client and restarts the timer.
+9. If any request comes in that time, it will again process that request and resets the timer.
+10. If no requests comes in that LINGERING_TIMEOUT that has been set.
+11. Then It will kill the connection after that time.
+
+7. The sixth timeout is RESOLVER_TIMEOUT
+
+RESOLVER_TIMEOUT
+================
+
+1. Resolver timeout is the DNS Timeout.
+2. This timeout is all about NGINX.
+3. If the Nginx server is perfoming a DNS request to some other server.
+4. Then How much time you want the Nginx server to wait before that request is either resolved or died.
+5. This time is specified in RESOLVER_TIMEOUT.
+
