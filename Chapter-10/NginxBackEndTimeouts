@@ -1,0 +1,63 @@
+
+
+1. The first one is PROXY_CONNECT_TIMEOUT
+
+PROXY_CONNECT_TIMEOUT
+=====================
+
+1. Consider a scenerio that Nginx is working as a Layer 7 (HTTP) load balancer.
+2. Now when the Nginx recieve a request from the Client, then it will try to decode that request and establish a connection with appropriate backend server
+   and sends the HTTP data to it and get the response from the backend server,
+   and then forward that response to the client.
+3. Now PROXY_CONNECT_TIMEOUT comes into play when Nginx tries to establish a connection with the appropriate backend server.
+4. Suppose we have given 5 sec as PROXY_CONNECT_TIMEOUT, so If Nginx cannot successfully establish a TCP connection with backend server in that time period, then It will just kill that connection.
+
+2. The second one is PROXY_SEND_TIMEOUT
+
+PROXY_SEND_TIMEOUT
+==================
+
+1. Now consider the scenerio that client sends a GET request to the Nginx server.
+2. Nginx server decodes that HTTP request and based on Load balancing algorithm that has been set, it chooses on which backend server it may need to send the request and HTTP data.
+3. Now Nginx will perfom TCP connection with appropriate backend server and also will send HTTP data that Nginx recieved from the client.
+4. Nginx will send this data in the form of 'bytes' or 'packets'.
+5. Now Nginx start a timer known as PROXY_SEND_TIMEOUT timer, when Nginx sends first packet to backend server.
+6. If that packet successfully accepted by backend server, then Nginx resets the timer and send another packet to backend server.
+6. Now If that packet is not successfully accepted by backend server (or we can say that Nginx does not recieve ACK packet back) then Nginx will not reset the timer.
+7. And If the amount of time for which a particular packet from Nginx is not accepted by backend server >= PROXY_SEND_TIMEOUT.
+8. Nginx kill the connection.
+
+3. The third one is PROXY_READ_TIMEOUT
+
+PROXY_READ_TIMEOUT
+==================
+
+1. Nginx has a directive called proxy_read_timeout which defaults to 60 secs.
+2. It determines how long nginx will wait to get the response to a request (request that Nginx made to backend servers).
+
+4. The fourth one is KEEPALIVE_TIMEOUT
+
+KEEPALIVE_TIMEOUT
+=================
+
+1. This KEEPALIVE_TIMEOUT for backend is same as KEEPALIVE_TIMEOUT for frontend specified in filename 'NginxFrontEndTimeouts'.
+2. But this KEEPALIVE_TIMEOUT is maximum time, upto which the connection b/w Nginx and backend server is alive but idle.
+3. If the amount of time for which connection b/w Nginx and backend server is alive but idle >= KEEPALIVE_TIMEOUT.
+4. Nginx will kill the connection.
+
+
+5. The fifth one is PROXY_NEXT_UPSTREAM_TIME
+
+PROXY_NEXT_UPSTREAM_TIME
+========================
+
+1. Now Consider the scenerio a client send a GET request to Nginx.
+2. Suppose we have set up 3 servers and Nginx is working as a Load balancer to those servers according to Round Robin Algorithm.
+3. Nginx decodes that GET request and send the HTTP data with GET request to Server 1 and also set up a timer known as PROXY_NEXT_UPSTREAM_TIMER.
+4. If Server 1 is not able to process request (let's say PROXY_SEND_TIMEOUT happens on Server 1).
+5. Nginx will send request to Server 2 let's say Server 2 is also not able to process request (let's say PROXY_SEND_TIMEOUT happens on Server 2).
+6. Then It will send request to Server 3, Now Server 3 is also not able to process request (let's say PROXY_SEND_TIMEOUT happens on Server 3).
+7. Then Nginx will again go to Server 1 and repeat.
+8. How long do you want Nginx to Jump to Next Upstream servers, if request cannot be fulfilled by servers.
+9. This value of time is specified in PROXY_NEXT_UPSTREAM_TIMER.
+
